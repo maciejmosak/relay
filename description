@@ -1,5 +1,9 @@
-This project is made to control power distribution for 3D-printers cluster (but of course may be used for powering any 12V devices). 
+	This project is made to control power distribution for 3D-printers cluster (but of course may be used for powering any 12V devices). 
  
-First, beta version will be Arduino UNO board controlled from PC by USB. We have there 6 analog pins to use (ADC), so I decided to divide input power to 5 output ports - I will measure voltage at input, and 5 currents for every output.
+	First, beta version will be Arduino UNO board controlled from PC by USB. 
 
-Switching power will be done by five, 16A (or 25A) relays, current measurement will be done by 1mOhm resistor and MCP6N11-100E/SN amplifier (which will give me 0,1V gain for every 1A).
+	We have there 6 analog pins to use (ADC), so I decided to divide input power to 5 output ports - I will measure voltage at input, and 5 currents for every output. (But firstly I will just use digital pins to provide any feedback, so I'll have just window with 5 buttons and 5 indicators (red/green light))
+
+	Switching power will be done by five, 16A (or 25A) relays, current measurement will be done by 1mOhm resistor and MCP6N11-100E/SN amplifier (which will give me 0,1V gain for every 1A).
+	
+	There gonna be one class for relays (binary state, binary feedback, double current) and second class for input (binary feedback, double voltage).
