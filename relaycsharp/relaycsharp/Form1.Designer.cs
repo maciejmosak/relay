@@ -173,6 +173,7 @@
             this.button7.Text = "Relay 5";
             this.button7.TextAlign = System.Drawing.ContentAlignment.TopCenter;
             this.button7.UseVisualStyleBackColor = true;
+            this.button7.Click += new System.EventHandler(this.button7_Click);
             // 
             // button8
             // 
@@ -183,6 +184,7 @@
             this.button8.Text = "Relay 6";
             this.button8.TextAlign = System.Drawing.ContentAlignment.TopCenter;
             this.button8.UseVisualStyleBackColor = true;
+            this.button8.Click += new System.EventHandler(this.button8_Click);
             // 
             // button9
             // 
@@ -190,7 +192,7 @@
             this.button9.Name = "button9";
             this.button9.Size = new System.Drawing.Size(183, 138);
             this.button9.TabIndex = 10;
-            this.button9.Text = "Relay 6";
+            this.button9.Text = "Relay 8";
             this.button9.TextAlign = System.Drawing.ContentAlignment.TopCenter;
             this.button9.UseVisualStyleBackColor = true;
             this.button9.Click += new System.EventHandler(this.button9_Click);
@@ -201,7 +203,7 @@
             this.button10.Name = "button10";
             this.button10.Size = new System.Drawing.Size(183, 138);
             this.button10.TabIndex = 9;
-            this.button10.Text = "Relay 5";
+            this.button10.Text = "Relay 7";
             this.button10.TextAlign = System.Drawing.ContentAlignment.TopCenter;
             this.button10.UseVisualStyleBackColor = true;
             this.button10.Click += new System.EventHandler(this.button10_Click);

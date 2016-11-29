@@ -11,32 +11,15 @@ int blink(){
 void serialEvent(){
   odebrane = Serial.readString();
   if(odebrane.substring(0,5)=="relay"){
- // blink();
+
   relay_number = odebrane.substring(6,7).toInt();
-  /*if(relay_number==1){
-    blink();
-  }else if(relay_number==2){
-    blink();
-    blink();
-  }else if(relay_number==3){
-    blink();
-    blink();
-    blink();
-  }else if(relay_number==4){
-    blink();
-    blink();
-    blink();
-    blink();
-  }*/
+
   if(odebrane.substring(9,11)=="on"){
     digitalWrite(relay_pins[((relay_number)-1)], LOW);
   }else if(odebrane.substring(9,12)=="off"){
     digitalWrite(relay_pins[((relay_number)-1)], HIGH);
   }
   }
-  //Serial.print("zrobione");
-  
-
 }
 void setup() {
   pinMode(led, OUTPUT);
@@ -56,9 +39,19 @@ void setup() {
   pinMode(7, OUTPUT);
   pinMode(8, OUTPUT);
   pinMode(9, OUTPUT);
+
+  digitalWrite(2, HIGH);
+  digitalWrite(3, HIGH);
+  digitalWrite(4, HIGH);
+  digitalWrite(5, HIGH);
+  digitalWrite(6, HIGH);
+  digitalWrite(7, HIGH);
+  digitalWrite(8, HIGH);
+  digitalWrite(9, HIGH);
+
+  
 }
 
-// the loop function runs over and over again forever
 void loop() {
 
 }

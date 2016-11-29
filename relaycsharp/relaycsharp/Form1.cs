@@ -192,6 +192,54 @@ namespace relaycsharp
             }
         }
 
+        private void button7_Click(object sender, EventArgs e)
+        {
+
+            if (!connection)
+            {
+                MessageBox.Show("Please connect to any device before changing states",
+                    "No connection",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
+            }
+            else if (relay5)
+            {
+                relay5 = false;
+                button7.BackColor = Color.Red;
+                serialPort1.WriteLine("relay(5, off)");
+            }
+            else
+            {
+                relay5 = true;
+                button7.BackColor = Color.Green;
+                serialPort1.WriteLine("relay(5, on)");
+            }
+        }
+
+        private void button8_Click(object sender, EventArgs e)
+        {
+
+            if (!connection)
+            {
+                MessageBox.Show("Please connect to any device before changing states",
+                    "No connection",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
+            }
+            else if (relay6)
+            {
+                relay6 = false;
+                button8.BackColor = Color.Red;
+                serialPort1.WriteLine("relay(6, off)");
+            }
+            else
+            {
+                relay6 = true;
+                button8.BackColor = Color.Green;
+                serialPort1.WriteLine("relay(6, on)");
+            }
+        }
+
         private void baudrate_SelectedIndexChanged(object sender, EventArgs e)
         {
         }
@@ -204,11 +252,49 @@ namespace relaycsharp
         private void button10_Click(object sender, EventArgs e)
         {
 
+            if (!connection)
+            {
+                MessageBox.Show("Please connect to any device before changing states",
+                    "No connection",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
+            }
+            else if (relay7)
+            {
+                relay7 = false;
+                button10.BackColor = Color.Red;
+                serialPort1.WriteLine("relay(7, off)");
+            }
+            else
+            {
+                relay7 = true;
+                button10.BackColor = Color.Green;
+                serialPort1.WriteLine("relay(7, on)");
+            }
         }
 
         private void button9_Click(object sender, EventArgs e)
         {
 
+            if (!connection)
+            {
+                MessageBox.Show("Please connect to any device before changing states",
+                    "No connection",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
+            }
+            else if (relay8)
+            {
+                relay8 = false;
+                button9.BackColor = Color.Red;
+                serialPort1.WriteLine("relay(8, off)");
+            }
+            else
+            {
+                relay8 = true;
+                button9.BackColor = Color.Green;
+                serialPort1.WriteLine("relay(8, on)");
+            }
         }
 
         private void label2_Click(object sender, EventArgs e)
