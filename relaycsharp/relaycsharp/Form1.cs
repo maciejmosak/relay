@@ -14,8 +14,7 @@ namespace relaycsharp
     public partial class Form1 : Form
  
     {
-        bool connection, relay1, relay2, relay3, relay4;
-        int relays, relayscheck;
+        bool connection, relay1, relay2, relay3, relay4, relay5, relay6, relay7, relay8;
         static SerialPort serialPort1;
         public Form1()
         {
@@ -66,12 +65,26 @@ namespace relaycsharp
             else
             {
 
-                button1.BackColor = Color.Green;
                 serialPort1.PortName = ComList.Text;
                 serialPort1.BaudRate = Convert.ToInt32(baudrate.Text);
-                serialPort1.Open();
-                connection = true;
-                button1.Text = "Disconnect";
+                try
+                {
+                    serialPort1.Open();
+                    connection = true;
+                    button1.Text = "Disconnect";
+                    button1.BackColor = Color.Green;
+                }
+                catch (UnauthorizedAccessException)
+                {
+                    MessageBox.Show("Heh, somebody is using this port",
+                   "Catch him and kill before next try...",
+                   MessageBoxButtons.OK,
+                   MessageBoxIcon.Warning // for Warning  
+                                          //MessageBoxIcon.Error // for Error 
+                                          //MessageBoxIcon.Information  // for Information
+                                          //MessageBoxIcon.Question // for Question
+                  );
+                }
             }
 
         }
@@ -100,13 +113,14 @@ namespace relaycsharp
             {
                 relay1 = false;
                 button3.BackColor = Color.Red;
+                serialPort1.WriteLine("relay(1, off)");
             }
             else
             {
                 relay1 = true;
                 button3.BackColor = Color.Green;
+                serialPort1.WriteLine("relay(1, on)");
             }
-            upload();
         }
 
         private void button4_Click(object sender, EventArgs e)
@@ -122,13 +136,14 @@ namespace relaycsharp
             {
                 relay2 = false;
                 button4.BackColor = Color.Red;
+                serialPort1.WriteLine("relay(2, off)");
             }
             else
             {
                 relay2 = true;
                 button4.BackColor = Color.Green;
+                serialPort1.WriteLine("relay(2, on)");
             }
-            upload();
         }
 
         private void button5_Click(object sender, EventArgs e)
@@ -144,13 +159,14 @@ namespace relaycsharp
             {
                 relay3 = false;
                 button5.BackColor = Color.Red;
+                serialPort1.WriteLine("relay(3, off)");
             }
             else
             {
                 relay3 = true;
                 button5.BackColor = Color.Green;
+                serialPort1.WriteLine("relay(3, on)");
             }
-            upload();
         }
 
         private void button6_Click(object sender, EventArgs e)
@@ -166,13 +182,14 @@ namespace relaycsharp
             {
                 relay4 = false;
                 button6.BackColor = Color.Red;
+                serialPort1.WriteLine("relay(4, off)");
             }
             else
             {
                 relay4 = true;
                 button6.BackColor = Color.Green;
+                serialPort1.WriteLine("relay(4, on)");
             }
-            upload();
         }
 
         private void baudrate_SelectedIndexChanged(object sender, EventArgs e)
@@ -184,7 +201,15 @@ namespace relaycsharp
 
         }
 
+        private void button10_Click(object sender, EventArgs e)
+        {
 
+        }
+
+        private void button9_Click(object sender, EventArgs e)
+        {
+
+        }
 
         private void label2_Click(object sender, EventArgs e)
         {
@@ -203,16 +228,8 @@ namespace relaycsharp
         private void SerialDataReceivedEventHandler(object sender,
                                    SerialDataReceivedEventArgs e)
         {
-            relayscheck = Convert.ToInt32(serialPort1.ReadLine());
+           // relayscheck = Convert.ToInt32(serialPort1.ReadLine());
         }
-        void upload()
-        {
-            relays = 0;
-            if (relay1) relays++;
-            if (relay2) relays = relays + 2;
-            if (relay3) relays = relays + 4;
-            if (relay4) relays = relays + 8;
-            serialPort1.WriteLine(Convert.ToString(relays));
-        }
+
     }
 }
