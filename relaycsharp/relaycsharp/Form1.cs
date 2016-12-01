@@ -12,55 +12,159 @@ using System.IO.Ports;
 namespace relaycsharp
 {
     public partial class Form1 : Form
- 
     {
-        bool connection, relay1, relay2, relay3, relay4, relay5, relay6, relay7, relay8;
-        static SerialPort serialPort1;
+        bool connection;
+        int relay_number;
+        bool[] relay_state = new bool[9];
+        Dictionary<Button, RelayButtons> buttons = new Dictionary<Button, RelayButtons>();
+        static SerialPort serialPort1; //oryginalna nazwa, prawda?
+        int relay_no;
+        bool[] isrelay = new bool[9];
+        private void relay_switch(object _sender, int relay_number)
+        {
+            Button sender = (Button)_sender;
+            if (!connection)
+            {
+                MessageBox.Show("Please connect to any device before changing states",
+                    "No connection",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
+            }
+            else if (relay_state[relay_number])
+            {
+                relay_state[relay_number] = false;
+                sender.BackColor = Color.Red;
+                serialPort1.WriteLine("relay(" + relay_number.ToString() + ", off)");
+            }
+            else
+            {
+                relay_state[relay_number] = true;
+                sender.BackColor = Color.Green;
+                serialPort1.WriteLine("relay(" + relay_number.ToString() + ", on)");
+            }
+        }
         public Form1()
         {
             InitializeComponent();
+            buttons[button3] = new RelayButtons(1);
+            buttons[button4] = new RelayButtons(2);
+            buttons[button5] = new RelayButtons(3);
+            buttons[button6] = new RelayButtons(4);
+            buttons[button7] = new RelayButtons(5);
+            buttons[button8] = new RelayButtons(6);
+            buttons[button9] = new RelayButtons(7);
+            buttons[button10] = new RelayButtons(8);
             getAvailablePorts();
             serialPort1 = new SerialPort();
-            serialPort1.DataReceived += SerialDataReceivedEventHandler;
+            baudrate.SelectedIndex = 0;
+            serialPort1.DataReceived += new SerialDataReceivedEventHandler(DataReceived);
+            
         }
 
-        private void RELAYS_Paint(object sender, PaintEventArgs e)
+        void unlock()
         {
 
-
+            for (int i = 8; i>relay_no; i--)
+            {
+                isrelay[i] = false;
+            }
+            for (int i = relay_no; i > 0; i--)
+            {
+                isrelay[i] = true;
+            }
+            button3.Enabled = isrelay[1];
+            button4.Enabled = isrelay[2];
+            button5.Enabled = isrelay[3];
+            button6.Enabled = isrelay[4];
+            button7.Enabled = isrelay[5];
+            button8.Enabled = isrelay[6];
+            button9.Enabled = isrelay[7];
+            button10.Enabled = isrelay[8];
         }
-
-        private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
+        String receiveddata;
+        delegate void valueDelegate(object sender, SerialDataReceivedEventArgs e);
+        public void DataReceived(object sender, SerialDataReceivedEventArgs e)
         {
+            if (label4.InvokeRequired)
+            {
+                label4.Invoke(new valueDelegate(DataReceived), sender, e);
+            }
+            else
+            {
+            }
+            try
+            {
+                receiveddata = serialPort1.ReadLine();
+            }
+            catch (TimeoutException) { }
+            catch (InvalidOperationException) { }
+            catch (System.IO.IOException) { }
 
+            //label4.Text = receiveddata;
+
+
+                if(receiveddata.Substring(0, 4) == "name")
+                {
+                  label4.Text = receiveddata.Substring(5, (receiveddata.Length - 8));
+
+                 Int32.TryParse(receiveddata.Substring((receiveddata.Length - 2),1), out relay_no);
+                unlock();
+            }
         }
-
-        private void tableLayoutPanel1_Paint(object sender, PaintEventArgs e)
+        void getAvailablePorts()
         {
-
+            String[] ports = SerialPort.GetPortNames();
+            ComList.Items.Clear();
+            ComList.Items.AddRange(ports);
+            if (ComList.Items.Count != 0) ComList.SelectedIndex = 0;
         }
+        void AnyButtonClick(object sender, System.EventArgs e)
+        {
+            relay_number = buttons[(Button)sender].relaynumber;
+            relay_switch(sender, relay_number);
+        }
+        //przycisk połączenia
+
 
         private void button1_Click(object sender, EventArgs e)
         {
-
             if(connection)
             {
+
+                serialPort1.WriteLine("all(off)");
                 serialPort1.Close();
                 button1.BackColor = Color.Empty;
+                button3.BackColor = Color.Empty;
+                button4.BackColor = Color.Empty;
+                button5.BackColor = Color.Empty;
+                button6.BackColor = Color.Empty;
+                button7.BackColor = Color.Empty;
+                button8.BackColor = Color.Empty;
+                button9.BackColor = Color.Empty;
+                button10.BackColor = Color.Empty;
+                button3.Enabled = false;
+                button4.Enabled = false;
+                button5.Enabled = false;
+                button6.Enabled = false;
+                button7.Enabled = false;
+                button8.Enabled = false;
+                button9.Enabled = false;
+                button10.Enabled = false;
+                for(int i=8; i>0; i--)
+                {
+                    relay_state[i] = false;
+                }
+
                 connection = false;
                 button1.Text = "Connect";
+                label4.Text = "No device connected";
             }
             else if (ComList.Text == "" || baudrate.Text == "")
             {
                 button1.BackColor = Color.Red;
                 MessageBox.Show("Choose port and baudrate first!",
                     "No port/baudrate choosen!",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Warning // for Warning  
-                                           //MessageBoxIcon.Error // for Error 
-                                           //MessageBoxIcon.Information  // for Information
-                                           //MessageBoxIcon.Question // for Question
-                   );
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
             else
             {
@@ -73,6 +177,9 @@ namespace relaycsharp
                     connection = true;
                     button1.Text = "Disconnect";
                     button1.BackColor = Color.Green;
+                    label4.Text = "default";
+                    
+                    serialPort1.WriteLine("hey");
                 }
                 catch (UnauthorizedAccessException)
                 {
@@ -88,234 +195,23 @@ namespace relaycsharp
             }
 
         }
-        void getAvailablePorts()
-        {
-            String[] ports = SerialPort.GetPortNames();
-            ComList.Items.Clear();
-            ComList.Items.AddRange(ports);
-        }
 
-        private void label1_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void button3_Click(object sender, EventArgs e)
-        {
-            if (!connection)
-            {
-                MessageBox.Show("Please connect to any device before changing states",
-                    "No connection",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Warning);
-            }
-            else if (relay1)
-            {
-                relay1 = false;
-                button3.BackColor = Color.Red;
-                serialPort1.WriteLine("relay(1, off)");
-            }
-            else
-            {
-                relay1 = true;
-                button3.BackColor = Color.Green;
-                serialPort1.WriteLine("relay(1, on)");
-            }
-        }
-
-        private void button4_Click(object sender, EventArgs e)
-        {
-            if (!connection)
-            {
-                MessageBox.Show("Please connect to any device before changing states",
-                    "No connection",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Warning);
-            }
-            else if (relay2)
-            {
-                relay2 = false;
-                button4.BackColor = Color.Red;
-                serialPort1.WriteLine("relay(2, off)");
-            }
-            else
-            {
-                relay2 = true;
-                button4.BackColor = Color.Green;
-                serialPort1.WriteLine("relay(2, on)");
-            }
-        }
-
-        private void button5_Click(object sender, EventArgs e)
-        {
-            if (!connection)
-            {
-                MessageBox.Show("Please connect to any device before changing states",
-                    "No connection",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Warning);
-            }
-            else if (relay3)
-            {
-                relay3 = false;
-                button5.BackColor = Color.Red;
-                serialPort1.WriteLine("relay(3, off)");
-            }
-            else
-            {
-                relay3 = true;
-                button5.BackColor = Color.Green;
-                serialPort1.WriteLine("relay(3, on)");
-            }
-        }
-
-        private void button6_Click(object sender, EventArgs e)
-        {
-            if (!connection)
-            {
-                MessageBox.Show("Please connect to any device before changing states",
-                    "No connection",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Warning);
-            }
-            else if (relay4)
-            {
-                relay4 = false;
-                button6.BackColor = Color.Red;
-                serialPort1.WriteLine("relay(4, off)");
-            }
-            else
-            {
-                relay4 = true;
-                button6.BackColor = Color.Green;
-                serialPort1.WriteLine("relay(4, on)");
-            }
-        }
-
-        private void button7_Click(object sender, EventArgs e)
-        {
-
-            if (!connection)
-            {
-                MessageBox.Show("Please connect to any device before changing states",
-                    "No connection",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Warning);
-            }
-            else if (relay5)
-            {
-                relay5 = false;
-                button7.BackColor = Color.Red;
-                serialPort1.WriteLine("relay(5, off)");
-            }
-            else
-            {
-                relay5 = true;
-                button7.BackColor = Color.Green;
-                serialPort1.WriteLine("relay(5, on)");
-            }
-        }
-
-        private void button8_Click(object sender, EventArgs e)
-        {
-
-            if (!connection)
-            {
-                MessageBox.Show("Please connect to any device before changing states",
-                    "No connection",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Warning);
-            }
-            else if (relay6)
-            {
-                relay6 = false;
-                button8.BackColor = Color.Red;
-                serialPort1.WriteLine("relay(6, off)");
-            }
-            else
-            {
-                relay6 = true;
-                button8.BackColor = Color.Green;
-                serialPort1.WriteLine("relay(6, on)");
-            }
-        }
-
-        private void baudrate_SelectedIndexChanged(object sender, EventArgs e)
-        {
-        }
-
-        private void Form1_Load(object sender, EventArgs e)
-        {
-
-        }
-
-        private void button10_Click(object sender, EventArgs e)
-        {
-
-            if (!connection)
-            {
-                MessageBox.Show("Please connect to any device before changing states",
-                    "No connection",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Warning);
-            }
-            else if (relay7)
-            {
-                relay7 = false;
-                button10.BackColor = Color.Red;
-                serialPort1.WriteLine("relay(7, off)");
-            }
-            else
-            {
-                relay7 = true;
-                button10.BackColor = Color.Green;
-                serialPort1.WriteLine("relay(7, on)");
-            }
-        }
-
-        private void button9_Click(object sender, EventArgs e)
-        {
-
-            if (!connection)
-            {
-                MessageBox.Show("Please connect to any device before changing states",
-                    "No connection",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Warning);
-            }
-            else if (relay8)
-            {
-                relay8 = false;
-                button9.BackColor = Color.Red;
-                serialPort1.WriteLine("relay(8, off)");
-            }
-            else
-            {
-                relay8 = true;
-                button9.BackColor = Color.Green;
-                serialPort1.WriteLine("relay(8, on)");
-            }
-        }
-
-        private void label2_Click(object sender, EventArgs e)
-        {
-
-        }
-
+//przycisk odświeżenia dostępnych portów
         private void button2_Click(object sender, EventArgs e)
         {
             getAvailablePorts();
         }
 
-        private void RELAY_SelectedIndexChanged(object sender, EventArgs e)
-        {
-
-        }
-        private void SerialDataReceivedEventHandler(object sender,
-                                   SerialDataReceivedEventArgs e)
-        {
-           // relayscheck = Convert.ToInt32(serialPort1.ReadLine());
-        }
-
     }
+
+    struct RelayButtons
+    {
+
+        public RelayButtons(int relaynumber)
+        {
+            this.relaynumber = relaynumber;
+        }
+        public int relaynumber;
+    }
+
 }
